@@ -7,7 +7,7 @@ const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {
 export default function ControlPanel() {
   const { config, setConfig } = useContext(AppContext);
   return (
-    <section className="card flex-row absolute mx-4 right-0 top-0 border-solid shadow-2xl">
+    <section className="card flex-row absolute m-4 right-0 top-0 p-4 bg-stone-50 shadow-xl">
       <label className="label">
         <span className="label-text">skip space</span>
         <input
