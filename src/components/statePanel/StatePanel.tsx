@@ -6,7 +6,7 @@ export default function StatePanel() {
     state: { duration, keystrokes, accuracy, inaccuracy },
   } = useContext(AppContext);
   return (
-    <section className="card flex-row shadow-lg bg-stone-50 p-4">
+    <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">
         <div className="stat-value text-lg">{duration}s</div>
         <div className="stat-title text-xs">Duration</div>
