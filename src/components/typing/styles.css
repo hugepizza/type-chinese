@@ -1,0 +1,28 @@
+@keyframes revealText {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0;
+  }
+}
+
+.text {
+  position: relative;
+  display: inline-block;
+  color: red;
+  font-size: 2em;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.text::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: blue;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: revealText 5s forwards;
+}
