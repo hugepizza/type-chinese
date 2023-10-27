@@ -211,7 +211,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
   }, []);
 
   return (
-    <section className=" mb-24">
+    <section className="my-32">
       <div className="mb-4">
         <h1>
           {currentContent.pingyin.map((ele, index) => (
