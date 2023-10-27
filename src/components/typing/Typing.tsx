@@ -130,6 +130,12 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
       if (typedKey === "Escape") {
         setTyping(false);
       }
+      if (typedKey === "Tab") {
+        setContentCursor(contentCursorRef.current + 1);
+        setCurrentContent(content[contentCursorRef.current + 1]);
+        setCursor(0);
+        return;
+      }
       if (!inMonitoringKeys(typedKey)) {
         return;
       }
@@ -226,9 +232,14 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
       </div>
       <p className="read-the-docs">
         {typing ? (
-          <span>
-            Press <kbd className="kbd kbd-sm">ESC</kbd> to pause.
-          </span>
+          <div className="flex flex-col items-center">
+            <p>
+              <kbd className="kbd kbd-sm">ESC</kbd> to pause.
+            </p>
+            <p>
+              <kbd className="kbd kbd-sm">Tab</kbd> to skip.
+            </p>
+          </div>
         ) : (
           <Mask />
         )}
