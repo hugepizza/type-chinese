@@ -1,10 +1,10 @@
-import { useContext } from "react";
-import AppContext from "../../context/AppContext";
+import { State } from "../../hooks/appStore";
 
-export default function StatePanel() {
-  const {
-    state: { duration, keystrokes, accuracy, inaccuracy },
-  } = useContext(AppContext);
+export default function StatePanel({
+  state: { duration, keystrokes, accuracy, inaccuracy },
+}: {
+  state: State;
+}) {
   return (
     <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">
@@ -15,7 +15,9 @@ export default function StatePanel() {
       </div>
       <div className="px-4 py-2">
         <div className="stat-value text-lg">
-          {(keystrokes / duration).toFixed(2)}
+          {isNaN((keystrokes / duration) * 1000)
+            ? "0"
+            : ((keystrokes / duration) * 1000).toFixed(2)}
         </div>
         <div className="stat-title text-xs">Keystrokes/Sec</div>
       </div>
