@@ -5,27 +5,17 @@ import { pinyin } from "pinyin-pro";
 import Typing, { Letter, Word } from "./components/typing/Typing";
 import ControlPanel from "./components/controlPanel/ControlPanel";
 import { useEffect, useState } from "react";
-import AppContext, { Config, State } from "./context/AppContext";
 import StatePanel from "./components/statePanel/StatePanel";
 import Footer from "./components/layout/Footer";
 import useTimer from "./hooks/useTimer";
+import useAppStore from "./hooks/appStore";
 
 function App() {
-  const [config, setConfig] = useState<Config>({
-    skipSpace: true,
-    showTone: true,
-  });
+  const { setStateField, setResume, setPause } = useAppStore();
   const { duration, pause, resume } = useTimer();
-  const [state, setState] = useState<State>({
-    duration: duration,
-    keystrokes: 0,
-    accuracy: 0,
-    inaccuracy: 0,
-  });
-
-  useEffect(() => {
-    setState((prevState) => ({ ...prevState, duration: duration }));
-  }, [duration]);
+  setStateField({ duration: duration });
+  setPause(pause);
+  setResume(resume);
 
   const [content, setContent] = useState<Word[]>([]);
   useEffect(() => {
@@ -48,23 +38,12 @@ function App() {
 
   return (
     <div className="flex flex-col h-screen">
-      <AppContext.Provider
-        value={{
-          config,
-          setConfig,
-          state,
-          setState,
-          pause,
-          resume,
-        }}
-      >
-        <main className="flex flex-col flex-grow justify-center items-center">
-          <ControlPanel />
-          {content.length > 0 && <Typing rawWords={content} />}
-          <StatePanel />
-        </main>
-        <Footer />
-      </AppContext.Provider>
+      <main className="flex flex-col flex-grow justify-center items-center">
+        <ControlPanel />
+        {content.length > 0 && <Typing rawWords={content} />}
+        <StatePanel />
+      </main>
+      <Footer />
     </div>
   );
 }

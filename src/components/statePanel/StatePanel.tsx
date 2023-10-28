@@ -1,10 +1,9 @@
-import { useContext } from "react";
-import AppContext from "../../context/AppContext";
+import useAppStore from "../../hooks/appStore";
 
 export default function StatePanel() {
   const {
     state: { duration, keystrokes, accuracy, inaccuracy },
-  } = useContext(AppContext);
+  } = useAppStore();
   return (
     <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import "./styles.css";
-import AppContext from "../../context/AppContext";
+import useAppStore from "../../hooks/appStore";
 export type Letter = {
   key: string;
   holder: string;
@@ -62,11 +62,12 @@ const changeTone = (
 export default function Typing({ rawWords }: { rawWords: Word[] }) {
   const {
     config: { skipSpace, showTone },
-    setState,
     pause,
     resume,
-  } = useContext(AppContext);
-
+    incrStateKeystrokes,
+    incrStateAccuracy,
+    incrStateInaccuracy,
+  } = useAppStore();
   const [shake, setShake] = useState(false);
   const content = rawWords.map((ele) => ({
     ...ele,
@@ -168,11 +169,10 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         expectedKey === " " ? "space" : expectedKey,
         typedKey === " " ? "space" : typedKey
       );
-
-      setState((prev) => ({ ...prev, keystrokes: prev.keystrokes + 1 }));
+      incrStateKeystrokes();
       // correct
       if (expectedKey === typedKey) {
-        setState((prev) => ({ ...prev, accuracy: prev.accuracy + 1 }));
+        incrStateAccuracy();
         // next letter
         setCurrentContent((prev) => ({
           ...prev,
@@ -198,7 +198,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         }
       } else {
         // wrong
-        setState((prev) => ({ ...prev, inaccuracy: prev.inaccuracy + 1 }));
+        incrStateInaccuracy();
         setCursor(0);
         setShake(true);
         setTimeout(() => setShake(false), 100);
