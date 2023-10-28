@@ -13,9 +13,15 @@ import useAppStore from "./hooks/appStore";
 function App() {
   const { setStateField, setResume, setPause } = useAppStore();
   const { duration, pause, resume } = useTimer();
-  setStateField({ duration: duration });
-  setPause(pause);
-  setResume(resume);
+  useEffect(() => {
+    setStateField({ duration: duration });
+    setPause(pause);
+    setResume(resume);
+  }, []);
+
+  useEffect(() => {
+    setStateField({ duration: duration });
+  }, [duration]);
 
   const [content, setContent] = useState<Word[]>([]);
   useEffect(() => {

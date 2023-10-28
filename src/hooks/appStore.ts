@@ -29,7 +29,9 @@ export type AppState = {
   incrStateInaccuracy: () => void;
 };
 
-const useAppStore = create<AppState>()((set) => ({
+const useAppStore = create<AppState>(
+    
+)((set) => ({
   config: {
     skipSpace: true,
     showTone: true,
@@ -59,7 +61,7 @@ const useAppStore = create<AppState>()((set) => ({
       ...state,
       config: {
         ...state.config,
-        skipSpace: !state.config.skipSpace,
+        showTone: !state.config.showTone,
       },
     })),
   incrStateKeystrokes: () =>

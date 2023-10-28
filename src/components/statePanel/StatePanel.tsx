@@ -14,7 +14,9 @@ export default function StatePanel() {
       </div>
       <div className="px-4 py-2">
         <div className="stat-value text-lg">
-          {(keystrokes / duration).toFixed(2)}
+          {isNaN((keystrokes / duration) * 1000)
+            ? "0"
+            : ((keystrokes / duration) * 1000).toFixed(2)}
         </div>
         <div className="stat-title text-xs">Keystrokes/Sec</div>
       </div>
