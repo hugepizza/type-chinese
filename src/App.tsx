@@ -2,27 +2,13 @@ import "./App.css";
 import data from "./assets/hsk/1.json";
 
 import { pinyin } from "pinyin-pro";
-import Typing, { Letter, Word } from "./components/typing/Typing";
+import TypingPanel from "./components/typing/TypingPanel";
 import ControlPanel from "./components/controlPanel/ControlPanel";
 import { useEffect, useState } from "react";
-import StatePanel from "./components/statePanel/StatePanel";
 import Footer from "./components/layout/Footer";
-import useTimer from "./hooks/useTimer";
-import useAppStore from "./hooks/appStore";
+import { Letter, Word } from "./components/typing/TypingContent";
 
 function App() {
-  const { setStateField, setResume, setPause } = useAppStore();
-  const { duration, pause, resume } = useTimer();
-  useEffect(() => {
-    setStateField({ duration: duration });
-    setPause(pause);
-    setResume(resume);
-  }, []);
-
-  useEffect(() => {
-    setStateField({ duration: duration });
-  }, [duration]);
-
   const [content, setContent] = useState<Word[]>([]);
   useEffect(() => {
     const segs = data.data.map((word) => ({ cn: word.cn, en: word.en }));
@@ -46,8 +32,7 @@ function App() {
     <div className="flex flex-col h-screen">
       <main className="flex flex-col flex-grow justify-center items-center">
         <ControlPanel />
-        {content.length > 0 && <Typing rawWords={content} />}
-        <StatePanel />
+        {content.length > 0 && <TypingPanel rawWords={content} />}
       </main>
       <Footer />
     </div>

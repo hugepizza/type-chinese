@@ -64,5 +64,5 @@ export default function useTimer() {
 
     setIsPaused(false);
   };
-  return { duration, pause, resume };
+  return { isPaused, duration, pause, resume };
 }

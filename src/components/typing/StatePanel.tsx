@@ -1,9 +1,10 @@
-import useAppStore from "../../hooks/appStore";
+import { State } from "../../hooks/appStore";
 
-export default function StatePanel() {
-  const {
-    state: { duration, keystrokes, accuracy, inaccuracy },
-  } = useAppStore();
+export default function StatePanel({
+  state: { duration, keystrokes, accuracy, inaccuracy },
+}: {
+  state: State;
+}) {
   return (
     <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">

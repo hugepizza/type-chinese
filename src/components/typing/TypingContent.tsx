@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./styles.css";
-import useAppStore from "../../hooks/appStore";
-import PauseMask from "./PauseMask";
+import useAppStore, { State } from "../../hooks/appStore";
 export type Letter = {
   key: string;
   holder: string;
@@ -60,14 +59,21 @@ const changeTone = (
   return newc;
 };
 
-export default function Typing({ rawWords }: { rawWords: Word[] }) {
+export default function TypingContent({
+  rawWords,
+  setState,
+  pause,
+  resume,
+  isPaused,
+}: {
+  rawWords: Word[];
+  setState: React.Dispatch<React.SetStateAction<State>>;
+  pause: () => void;
+  resume: () => void;
+  isPaused: boolean;
+}) {
   const {
     config: { skipSpace, showTone },
-    pause,
-    resume,
-    incrStateKeystrokes,
-    incrStateAccuracy,
-    incrStateInaccuracy,
   } = useAppStore();
   const [shake, setShake] = useState(false);
   const content = rawWords.map((ele) => ({
@@ -85,11 +91,9 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
   const [currentContent, setCurrentContent] = useState(content[contentCursor]);
   // cursor in pingyin list
   const [cursor, setCursor] = useState(0);
-  // control pause
-  const [typing, setTyping] = useState(false);
 
   // ref in call back
-  const typingRef = useRef(typing);
+  const isPausedRef = useRef(isPaused);
   const cursorRef = useRef(cursor);
   const contentCursorRef = useRef(contentCursor);
   const currentContentRef = useRef(currentContent);
@@ -116,8 +120,8 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
   }, [currentContent]);
 
   useEffect(() => {
-    typingRef.current = typing;
-  }, [typing]);
+    isPausedRef.current = isPaused;
+  }, [isPaused]);
 
   useEffect(() => {
     cursorRef.current = cursor;
@@ -131,9 +135,8 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
     e.stopPropagation();
     const typedKey = e.key;
 
-    if (typingRef.current) {
+    if (!isPausedRef.current) {
       if (typedKey === "Escape") {
-        setTyping(false);
         pause();
       }
       if (typedKey === "Tab") {
@@ -170,10 +173,10 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         expectedKey === " " ? "space" : expectedKey,
         typedKey === " " ? "space" : typedKey
       );
-      incrStateKeystrokes();
+      setState((prev) => ({ ...prev, keystrokes: ++prev.keystrokes }));
       // correct
       if (expectedKey === typedKey) {
-        incrStateAccuracy();
+        setState((prev) => ({ ...prev, accuracy: ++prev.accuracy }));
         // next letter
         setCurrentContent((prev) => ({
           ...prev,
@@ -199,14 +202,13 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         }
       } else {
         // wrong
-        incrStateInaccuracy();
+        setState((prev) => ({ ...prev, inaccuracy: ++prev.inaccuracy }));
         setCursor(0);
         setShake(true);
         setTimeout(() => setShake(false), 100);
         setCurrentContent((prev) => reset(prev, showToneRef.current));
       }
     } else {
-      setTyping(true);
       resume();
     }
   };
@@ -239,18 +241,14 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         </span>
       </div>
       <div className="read-the-docs">
-        {typing ? (
-          <div className="flex flex-col items-center">
-            <p>
-              <kbd className="kbd kbd-sm">ESC</kbd> to pause.
-            </p>
-            <p>
-              <kbd className="kbd kbd-sm">Tab</kbd> to skip.
-            </p>
-          </div>
-        ) : (
-          <PauseMask />
-        )}
+        <div className="flex flex-col items-center">
+          <p>
+            <kbd className="kbd kbd-sm">ESC</kbd> to pause.
+          </p>
+          <p>
+            <kbd className="kbd kbd-sm">Tab</kbd> to skip.
+          </p>
+        </div>
       </div>
     </section>
   );
