@@ -67,6 +67,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
     resume,
   } = useContext(AppContext);
 
+  const [shake, setShake] = useState(false);
   const content = rawWords.map((ele) => ({
     ...ele,
     pingyin: ele.pingyin.map((p) => ({
@@ -199,6 +200,8 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         // wrong
         setState((prev) => ({ ...prev, inaccuracy: prev.inaccuracy + 1 }));
         setCursor(0);
+        setShake(true);
+        setTimeout(() => setShake(false), 100);
         setCurrentContent((prev) => reset(prev, showToneRef.current));
       }
     } else {
@@ -216,7 +219,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
 
   return (
     <section className="my-32">
-      <div className="mb-4">
+      <div className={`mb-4 ${shake ? "shake" : ""}`}>
         <h1>
           {currentContent.pingyin.map((ele, index) => (
             <span
