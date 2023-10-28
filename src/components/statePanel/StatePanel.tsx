@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import AppContext from "../../context/configContext";
+import AppContext from "../../context/AppContext";
 
 export default function StatePanel() {
   const {
@@ -8,7 +8,9 @@ export default function StatePanel() {
   return (
     <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">
-        <div className="stat-value text-lg">{duration}s</div>
+        <div className="stat-value text-lg">
+          {(duration / 1000).toFixed(0)}s
+        </div>
         <div className="stat-title text-xs">Duration</div>
       </div>
       <div className="px-4 py-2">

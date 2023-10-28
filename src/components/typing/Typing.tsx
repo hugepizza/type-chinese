@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import "./styles.css";
-import AppContext from "../../context/configContext";
+import AppContext from "../../context/AppContext";
 export type Letter = {
   key: string;
   holder: string;
@@ -63,6 +63,8 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
   const {
     config: { skipSpace, showTone },
     setState,
+    pause,
+    resume,
   } = useContext(AppContext);
 
   const content = rawWords.map((ele) => ({
@@ -129,6 +131,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
     if (typingRef.current) {
       if (typedKey === "Escape") {
         setTyping(false);
+        pause();
       }
       if (typedKey === "Tab") {
         setContentCursor(contentCursorRef.current + 1);
@@ -200,6 +203,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
       }
     } else {
       setTyping(true);
+      resume();
     }
   };
 
@@ -230,7 +234,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
           {currentContent.english}
         </span>
       </div>
-      <p className="read-the-docs">
+      <div className="read-the-docs">
         {typing ? (
           <div className="flex flex-col items-center">
             <p>
@@ -243,7 +247,7 @@ export default function Typing({ rawWords }: { rawWords: Word[] }) {
         ) : (
           <Mask />
         )}
-      </p>
+      </div>
     </section>
   );
 }

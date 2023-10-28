@@ -17,6 +17,9 @@ export type ContextType = {
   setState: React.Dispatch<React.SetStateAction<State>>;
   config: Config;
   setConfig: React.Dispatch<React.SetStateAction<Config>>;
+  pause: () => void;
+  resume: () => void;
+  // end: () => void;
 };
 
 const AppContext = createContext({
@@ -26,6 +29,9 @@ const AppContext = createContext({
   state: {} as State,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setState: (_: State) => {},
+  pause: () => {},
+  resume: () => {},
+  // end: () => {},
 } as ContextType);
 
 export default AppContext;

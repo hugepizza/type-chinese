@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import AppContext from "../../context/configContext";
+import AppContext from "../../context/AppContext";
 
 const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {
   event.preventDefault();
