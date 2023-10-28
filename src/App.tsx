@@ -3,6 +3,9 @@ import TypingPanel from "./components/typing/TypingPanel";
 import ControlPanel from "./components/controlPanel/ControlPanel";
 import Footer from "./components/layout/Footer";
 import useTextBook from "./hooks/useTextBoos";
+import { inject } from "@vercel/analytics";
+
+inject();
 
 function App() {
   const words = useTextBook({ shuffle: true });
