@@ -197,7 +197,9 @@ export default function TypingContent({
                 key={ele.tone + index}
               >
                 {memoryMode && letterCursor <= index
-                  ? "*"
+                  ? ele.key === " "
+                    ? " "
+                    : "*"
                   : showTone
                   ? ele.tone
                   : ele.key}
