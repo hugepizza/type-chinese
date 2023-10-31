@@ -1,18 +1,18 @@
 import useAppStore from "../../hooks/appStore";
+import Textbook from "./Textbook";
 
 const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {
   event.preventDefault();
 };
-export default function ControlPanel() {
+export default function Panel() {
   const {
     config: { skipSpace, showTone },
     toggleSkipSpace,
     toggleShowTone,
   } = useAppStore();
   return (
-    <section className="card flex-row absolute m-4 right-0 top-0 p-4 shadow-xl">
-      <label className="label">
-        <span className="label-text">skip space</span>
+    <div className="card  items-center flex-row absolute m-4 right-0 top-0 p-4 shadow-xl ">
+      <label className="label flex-col">
         <input
           type="checkbox"
           className="toggle"
@@ -22,10 +22,9 @@ export default function ControlPanel() {
             toggleSkipSpace();
           }}
         />
+        <span className="label-text">skip space</span>
       </label>
-
-      <label className="label">
-        <span className="label-text"> show tone</span>
+      <label className="label  flex-col">
         <input
           type="checkbox"
           className="toggle"
@@ -35,7 +34,9 @@ export default function ControlPanel() {
             toggleShowTone();
           }}
         />
+        <span className="label-text"> show tone</span>
       </label>
-    </section>
+      <Textbook />
+    </div>
   );
 }
