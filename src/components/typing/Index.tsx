@@ -58,7 +58,6 @@ export default function TypingPanel({
   const stateRef = useRef(state);
   useEffect(() => {
     stateRef.current = state;
-    console.log("state", state);
   }, [state]);
 
   return (

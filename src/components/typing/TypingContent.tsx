@@ -5,6 +5,7 @@ import Mask from "./Mask";
 import { produce } from "immer";
 export type Letter = {
   key: string;
+  tone: string;
   holder: string;
 };
 export type Word = {
@@ -16,17 +17,6 @@ export type Word = {
 const inMonitoringKeys = (key: string) =>
   key.length === 1 &&
   ((key >= "A" && key <= "Z") || (key >= "a" && key <= "z") || key === " ");
-
-// update holder while tone changed
-const changeTone = (words: Word[], showTone: boolean): Word[] => {
-  return words.map((ele) => ({
-    ...ele,
-    pingyin: ele.pingyin.map((p) => ({
-      ...p,
-      holder: showTone ? p.holder : p.key,
-    })),
-  }));
-};
 
 export default function TypingContent({
   words,
@@ -46,35 +36,20 @@ export default function TypingContent({
   typingStatus: "NOT_STARTED" | "PAUSED" | "TYPING";
 }) {
   const {
-    config: { skipSpace, showTone },
+    config: { skipSpace, showTone, memoryMode },
   } = useAppStore();
-  // never change
-  const [originalWords] = useState(words);
 
   const [shake, setShake] = useState(false);
-
-  const [displayWords, setDisplayWords] = useState(
-    changeTone(originalWords, showTone)
-  );
 
   const [wordCursor, setWordCursor] = useState(0);
 
   const [letterCursor, setLetterCursor] = useState(0);
 
   // ref in call back
-  const displayWordsRef = useRef(displayWords);
   const typingStatusRef = useRef(typingStatus);
   const letterCursorRef = useRef(letterCursor);
   const wordCursorRef = useRef(wordCursor);
   const skipSpaceRef = useRef(skipSpace);
-  const showToneRef = useRef(showTone);
-
-  // update tone
-  useEffect(() => {
-    console.log("tone update", showTone);
-    setDisplayWords(changeTone(originalWords, showTone));
-    showToneRef.current = showTone;
-  }, [showTone]);
 
   useEffect(() => {
     skipSpaceRef.current = skipSpace;
@@ -92,10 +67,6 @@ export default function TypingContent({
   useEffect(() => {
     wordCursorRef.current = wordCursor;
   }, [wordCursor]);
-
-  useEffect(() => {
-    displayWordsRef.current = displayWords;
-  }, [displayWords]);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -128,9 +99,7 @@ export default function TypingContent({
       }
 
       let expectedKey =
-        displayWordsRef.current[wordCursorRef.current].pingyin[
-          letterCursorRef.current
-        ].key;
+        words[wordCursorRef.current].pingyin[letterCursorRef.current].key;
       console.log(
         "expected, typed",
         expectedKey === " " ? "space" : expectedKey,
@@ -143,9 +112,7 @@ export default function TypingContent({
       // change one more letter color
       if (expectedKey === " " && skipSpaceRef.current) {
         expectedKey =
-          displayWordsRef.current[wordCursorRef.current].pingyin[
-            letterCursorRef.current + 1
-          ].key;
+          words[wordCursorRef.current].pingyin[letterCursorRef.current + 1].key;
 
         stepAfterCorrect = 2;
       }
@@ -171,15 +138,17 @@ export default function TypingContent({
         // next word
         if (
           letterCursorRef.current ===
-          displayWords[wordCursorRef.current].pingyin.length - 1
+          words[wordCursorRef.current].pingyin.length - 1
         ) {
-          setTypingState((prev) =>
-            produce(prev, (draft) => {
-              ++draft.words;
-            })
-          );
-          setWordCursor(wordCursorRef.current + 1);
-          setLetterCursor(0);
+          setTimeout(() => {
+            setTypingState((prev) =>
+              produce(prev, (draft) => {
+                ++draft.words;
+              })
+            );
+            setWordCursor(wordCursorRef.current + 1);
+            setLetterCursor(0);
+          }, 180);
         }
       } else {
         // wrong
@@ -190,7 +159,7 @@ export default function TypingContent({
         );
         setTypingState((prev) =>
           produce(prev, (draft) => {
-            const word = displayWords[wordCursorRef.current];
+            const word = words[wordCursorRef.current];
             const index = draft.inaccuracyWords.findIndex(
               (ele) => ele === word.chinese
             );
@@ -220,20 +189,24 @@ export default function TypingContent({
         <Mask typingStatus={typingStatus} />
         <div>
           <h1>
-            {displayWords[wordCursor].pingyin.map((ele, index) => (
+            {words[wordCursor].pingyin.map((ele, index) => (
               <span
                 className={`${
                   letterCursor > index ? "text-black" : "text-slate-400"
                 } font-semibold`}
-                key={ele.holder + index}
+                key={ele.tone + index}
               >
-                {ele.holder}
+                {memoryMode && letterCursor <= index
+                  ? "*"
+                  : showTone
+                  ? ele.tone
+                  : ele.key}
               </span>
             ))}
           </h1>
-          <h1>{displayWords[wordCursor].chinese}</h1>
+          <h1>{words[wordCursor].chinese}</h1>
           <span className="text-3xl text-stone-400">
-            {displayWords[wordCursor].english}
+            {words[wordCursor].english}
           </span>
         </div>
       </div>

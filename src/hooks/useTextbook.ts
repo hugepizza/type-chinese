@@ -20,10 +20,11 @@ export default function useTextbook() {
         const segs = data.data.map((word) => ({ cn: word.cn, en: word.en }));
         const words: Word[] = segs.map((seg) => {
           const keys = pinyin(seg.cn, { toneType: "none" }).split("");
-          const holder = pinyin(seg.cn).split("");
+          const tone = pinyin(seg.cn).split("");
           const letters: Letter[] = keys.map((ele, index) => ({
             key: ele,
-            holder: holder[index],
+            tone: tone[index],
+            holder: tone[index],
           }));
           return {
             pingyin: letters,

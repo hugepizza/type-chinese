@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 export type Config = {
   skipSpace: boolean;
   showTone: boolean;
+  memoryMode: boolean;
   currentTextbook: Textbook;
   textbooks: Textbook[];
 };
@@ -27,6 +28,7 @@ export type AppState = {
   setConfigField: (field: Partial<Config>) => void;
   toggleSkipSpace: () => void;
   toggleShowTone: () => void;
+  toggleMemoryMode: () => void;
   setTextbooks: (books: Textbook[]) => void;
   setCurrentTextbook: (book: Textbook) => void;
 };
@@ -76,6 +78,11 @@ const useAppStore = create<AppState>()(
     toggleShowTone: () =>
       set((state) => {
         state.config.showTone = !state.config.showTone;
+      }),
+
+    toggleMemoryMode: () =>
+      set((state) => {
+        state.config.memoryMode = !state.config.memoryMode;
       }),
 
     setTextbooks: (textbooks: Textbook[]) =>
