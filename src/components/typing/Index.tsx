@@ -5,19 +5,29 @@ import useTimer from "../../hooks/useTimer";
 
 import { useEffect, useRef, useState } from "react";
 import React from "react";
+import { TypingState } from "../../store/appStore";
+import useHistoryStore from "../../store/historyStore";
 
 const EndupModal = React.lazy(() => import("./EndupModal"));
 
-export default function TypingPanel({ words }: { words: Word[] }) {
-  const { typingStatus, duration, pause, resume, end, start } = useTimer();
+export default function TypingPanel({
+  textbook,
+  words,
+}: {
+  textbook: string;
+  words: Word[];
+}) {
+  const { typingStatus, duration, pause, resume, end, start, startTime } =
+    useTimer();
   const [popping, setPopping] = useState(false);
-
-  const [state, setState] = useState({
+  const { addHistory } = useHistoryStore();
+  const [state, setState] = useState<TypingState>({
     duration: 0,
     keystrokes: 0,
     accuracy: 0,
     inaccuracy: 0,
     words: 0,
+    inaccuracyWords: [],
   });
   const resetState = () => {
     setState({
@@ -26,6 +36,7 @@ export default function TypingPanel({ words }: { words: Word[] }) {
       accuracy: 0,
       inaccuracy: 0,
       words: 0,
+      inaccuracyWords: [],
     });
   };
 
@@ -44,12 +55,18 @@ export default function TypingPanel({ words }: { words: Word[] }) {
     poppingRef.current = popping;
   }, [popping]);
 
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+    console.log("state", state);
+  }, [state]);
+
   return (
     <section>
       <TypingContent
         {...{
           typingStatus,
-          setState,
+          setTypingState: setState,
           words,
           pause,
           resume,
@@ -61,6 +78,15 @@ export default function TypingPanel({ words }: { words: Word[] }) {
             start();
           },
           end: () => {
+            const lastState = { ...stateRef.current };
+            // console.log(state);
+            // console.log(lastState);
+
+            addHistory({
+              ...lastState,
+              textbook: textbook,
+              startAt: startTime || new Date(),
+            });
             setPopping(true);
             end();
             resetState();

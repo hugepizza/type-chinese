@@ -1,4 +1,4 @@
-import useAppStore from "../../hooks/appStore";
+import useAppStore from "../../store/appStore";
 
 export default function Textbook() {
   const {

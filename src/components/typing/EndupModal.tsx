@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { State } from "../../hooks/appStore";
+import { TypingState } from "../../store/appStore";
 
 export default function EndupModal({
   state,
   visible,
   setVisible,
 }: {
-  state: State;
+  state: TypingState;
   visible: boolean;
   setVisible: (v: boolean) => void;
 }) {
-  const [localState, setLocalState] = useState<State | null>(null);
+  const [localState, setLocalState] = useState<TypingState | null>(null);
 
   useEffect(() => {
     if (

@@ -1,4 +1,4 @@
-import useAppStore from "../../hooks/appStore";
+import useAppStore from "../../store/appStore";
 import Textbook from "./Textbook";
 
 const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {

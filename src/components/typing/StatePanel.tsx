@@ -1,9 +1,9 @@
-import { State } from "../../hooks/appStore";
+import { TypingState } from "../../store/appStore";
 
 export default function StatePanel({
   state: { duration, keystrokes, accuracy, inaccuracy },
 }: {
-  state: State;
+  state: TypingState;
 }) {
   return (
     <section className="card flex-row shadow-lg p-4">

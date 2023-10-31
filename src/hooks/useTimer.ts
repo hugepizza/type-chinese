@@ -85,5 +85,13 @@ export default function useTimer() {
     setPausedDuration(0);
   };
 
-  return { typingStatus: status, duration, pause, resume, start, end };
+  return {
+    typingStatus: status,
+    duration,
+    pause,
+    resume,
+    start,
+    end,
+    startTime,
+  };
 }

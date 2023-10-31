@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import "./styles.css";
-import useAppStore, { State } from "../../hooks/appStore";
+import useAppStore, { TypingState } from "../../store/appStore";
 import Mask from "./Mask";
+import { produce } from "immer";
 export type Letter = {
   key: string;
   holder: string;
@@ -29,7 +30,7 @@ const changeTone = (words: Word[], showTone: boolean): Word[] => {
 
 export default function TypingContent({
   words,
-  setState,
+  setTypingState,
   pause,
   resume,
   end,
@@ -37,7 +38,7 @@ export default function TypingContent({
   typingStatus,
 }: {
   words: Word[];
-  setState: React.Dispatch<React.SetStateAction<State>>;
+  setTypingState: React.Dispatch<React.SetStateAction<TypingState>>;
   pause: () => void;
   resume: () => void;
   end: () => void;
@@ -153,10 +154,18 @@ export default function TypingContent({
         expectedKey === " " ? "space" : expectedKey,
         typedKey === " " ? "space" : typedKey
       );
-      setState((prev) => ({ ...prev, keystrokes: ++prev.keystrokes }));
+      setTypingState((prev) =>
+        produce(prev, (draft) => {
+          ++draft.keystrokes;
+        })
+      );
       // correct
       if (expectedKey === typedKey) {
-        setState((prev) => ({ ...prev, accuracy: ++prev.accuracy }));
+        setTypingState((prev) =>
+          produce(prev, (draft) => {
+            ++draft.accuracy;
+          })
+        );
         // next letter
         setLetterCursor(letterCursorRef.current + stepAfterCorrect);
         // next word
@@ -164,13 +173,33 @@ export default function TypingContent({
           letterCursorRef.current ===
           displayWords[wordCursorRef.current].pingyin.length - 1
         ) {
-          setState((prev) => ({ ...prev, words: ++prev.words }));
+          setTypingState((prev) =>
+            produce(prev, (draft) => {
+              ++draft.words;
+            })
+          );
           setWordCursor(wordCursorRef.current + 1);
           setLetterCursor(0);
         }
       } else {
         // wrong
-        setState((prev) => ({ ...prev, inaccuracy: prev.inaccuracy + 1 }));
+        setTypingState((prev) =>
+          produce(prev, (draft) => {
+            ++draft.inaccuracy;
+          })
+        );
+        setTypingState((prev) =>
+          produce(prev, (draft) => {
+            const word = displayWords[wordCursorRef.current];
+            const index = draft.inaccuracyWords.findIndex(
+              (ele) => ele === word.chinese
+            );
+            if (index === -1) {
+              draft.inaccuracyWords.push(word.chinese);
+            }
+          })
+        );
+
         setLetterCursor(0);
         setShake(true);
         setTimeout(() => setShake(false), 100);

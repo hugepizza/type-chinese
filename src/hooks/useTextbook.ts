@@ -3,7 +3,7 @@ import { Letter, Word } from "../components/typing/TypingContent";
 import _ from "lodash";
 
 import { pinyin } from "pinyin-pro";
-import useAppStore from "./appStore";
+import useAppStore from "../store/appStore";
 export default function useTextbook() {
   const shuffle = true;
   const {

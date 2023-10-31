@@ -4,19 +4,25 @@ import ControlPanel from "./components/controlPanel/Index";
 import Footer from "./components/layout/Footer";
 import useTextbook from "./hooks/useTextbook";
 import { inject } from "@vercel/analytics";
+import { enableMapSet } from "immer";
 
+enableMapSet();
 inject();
 
 function App() {
   const { name: textbookName, content: words } = useTextbook();
-  console.log("words.length", words.length);
 
   return (
     <div className="flex flex-col h-screen">
       <main className="flex flex-col flex-grow justify-center items-center">
-        {textbookName}
         <ControlPanel />
-        {words.length > 0 && <TypingPanel words={words} key={textbookName} />}
+        {words.length > 0 && (
+          <TypingPanel
+            words={words}
+            textbook={textbookName}
+            key={textbookName}
+          />
+        )}
       </main>
       <Footer />
     </div>
