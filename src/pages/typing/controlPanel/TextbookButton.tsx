@@ -1,6 +1,6 @@
-import useAppStore from "../../store/appStore";
+import useAppStore from "../../../store/appStore";
 
-export default function Textbook() {
+export default function TextbookButton() {
   const {
     setCurrentTextbook,
     config: { textbooks, currentTextbook },

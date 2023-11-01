@@ -1,31 +1,22 @@
 import "./App.css";
-import TypingPanel from "./components/typing/Index";
-import ControlPanel from "./components/controlPanel/Index";
-import Footer from "./components/layout/Footer";
-import useTextbook from "./hooks/useTextbook";
+
 import { inject } from "@vercel/analytics";
 import { enableMapSet } from "immer";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Typing from "./pages/typing/page";
+import LearningTracker from "./pages/learningTracker/page";
 
 enableMapSet();
 inject();
 
 function App() {
-  const { name: textbookName, content: words } = useTextbook();
-
   return (
-    <div className="flex flex-col h-screen">
-      <main className="flex flex-col flex-grow justify-center items-center">
-        <ControlPanel />
-        {words.length > 0 && (
-          <TypingPanel
-            words={words}
-            textbook={textbookName}
-            key={textbookName}
-          />
-        )}
-      </main>
-      <Footer />
-    </div>
+    <BrowserRouter basename="/">
+      <Routes>
+        <Route path="/" element={<Typing />} />
+        <Route path="/tracker" element={<LearningTracker />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

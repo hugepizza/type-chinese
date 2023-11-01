@@ -1,5 +1,6 @@
-import useAppStore from "../../store/appStore";
-import Textbook from "./Textbook";
+import useAppStore from "../../../store/appStore";
+import TextbookButton from "./TextbookButton";
+import TrackerButton from "./TrackerButton";
 
 const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {
   event.preventDefault();
@@ -49,7 +50,8 @@ export default function Panel() {
         />
         <span className="label-text"> memory mode</span>
       </label>
-      <Textbook />
+      <TextbookButton />
+      <TrackerButton />
     </div>
   );
 }

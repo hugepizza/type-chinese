@@ -1,7 +1,7 @@
 import { TypingState } from "../../store/appStore";
 
 export default function StatePanel({
-  state: { duration, keystrokes, accuracy, inaccuracy },
+  state: { duration, inaccuracy, words },
 }: {
   state: TypingState;
 }) {
@@ -15,19 +15,19 @@ export default function StatePanel({
       </div>
       <div className="px-4 py-2">
         <div className="stat-value text-lg">
-          {isNaN((keystrokes / duration) * 1000)
+          {isNaN((words / duration) * 1000)
             ? "0"
-            : ((keystrokes / duration) * 1000).toFixed(2)}
+            : ((words / duration) * 1000).toFixed(2)}
         </div>
-        <div className="stat-title text-xs">Keystrokes/Sec</div>
+        <div className="stat-title text-xs">Words/Sec</div>
       </div>
       <div className="px-4 py-2">
-        <div className="stat-value text-lg">{keystrokes}</div>
-        <div className="stat-title text-xs">Keystrokes</div>
+        <div className="stat-value text-lg">{words}</div>
+        <div className="stat-title text-xs">Words</div>
       </div>
       <div className="px-4 py-2">
         <div className="stat-value text-lg">
-          {((accuracy / (accuracy + inaccuracy)) * 100 || 100).toFixed(2)}%
+          {((words / (words + inaccuracy)) * 100 || 100).toFixed(2)}%
         </div>
         <div className="stat-title text-xs">Accuracy Rate</div>
       </div>

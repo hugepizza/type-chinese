@@ -13,18 +13,16 @@ export type History = {
 
 const useHistoryStore = create<History>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       typingHistory: [],
       addHistory: (h: TypingRecord) =>
-        set((state) => {
-          const newh = { ...state, history: [...state.typingHistory, h] };
-          console.log("addHistory", h);
-          return newh;
+        set({
+          typingHistory: (get().typingHistory as TypingRecord[]).concat(h),
         }),
     }),
     {
       name: "typingHistory",
-      version: 2,
+      version: 3,
     }
   )
 );
