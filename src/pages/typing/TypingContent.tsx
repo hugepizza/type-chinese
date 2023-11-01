@@ -24,6 +24,7 @@ export default function TypingContent({
   pause,
   resume,
   end,
+  disrupt,
   start,
   typingStatus,
 }: {
@@ -32,6 +33,7 @@ export default function TypingContent({
   pause: () => void;
   resume: () => void;
   end: () => void;
+  disrupt: () => void;
   start: () => void;
   typingStatus: "NOT_STARTED" | "PAUSED" | "TYPING";
 }) {
@@ -45,11 +47,25 @@ export default function TypingContent({
 
   const [letterCursor, setLetterCursor] = useState(0);
 
+  const endCurrentTying = () => {
+    console.log("endCurrentTying");
+    setLetterCursor(0);
+    setWordCursor(0);
+    end();
+  };
+
+  const disruptCurrentTying = () => {
+    console.log("disruptCurrentTying");
+    setLetterCursor(0);
+    setWordCursor(0);
+    disrupt();
+  };
   // ref in call back
   const typingStatusRef = useRef(typingStatus);
   const letterCursorRef = useRef(letterCursor);
   const wordCursorRef = useRef(wordCursor);
   const skipSpaceRef = useRef(skipSpace);
+  const wordsRef = useRef(words);
 
   useEffect(() => {
     skipSpaceRef.current = skipSpace;
@@ -61,12 +77,16 @@ export default function TypingContent({
 
   useEffect(() => {
     letterCursorRef.current = letterCursor;
-    console.log("letterCursor changed");
   }, [letterCursor]);
 
   useEffect(() => {
     wordCursorRef.current = wordCursor;
   }, [wordCursor]);
+
+  useEffect(() => {
+    wordsRef.current = words;
+    disruptCurrentTying();
+  }, [words]);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -78,9 +98,7 @@ export default function TypingContent({
       }
     } else if (typingStatusRef.current === "PAUSED") {
       if (typedKey === "Escape") {
-        setLetterCursor(0);
-        setWordCursor(0);
-        end();
+        endCurrentTying();
       }
       if (typedKey === "Enter") {
         resume();
@@ -99,7 +117,8 @@ export default function TypingContent({
       }
 
       let expectedKey =
-        words[wordCursorRef.current].pingyin[letterCursorRef.current].key;
+        wordsRef.current[wordCursorRef.current].pingyin[letterCursorRef.current]
+          .key;
       console.log(
         "expected, typed",
         expectedKey === " " ? "space" : expectedKey,
@@ -112,7 +131,9 @@ export default function TypingContent({
       // change one more letter color
       if (expectedKey === " " && skipSpaceRef.current) {
         expectedKey =
-          words[wordCursorRef.current].pingyin[letterCursorRef.current + 1].key;
+          wordsRef.current[wordCursorRef.current].pingyin[
+            letterCursorRef.current + 1
+          ].key;
 
         stepAfterCorrect = 2;
       }
@@ -138,7 +159,7 @@ export default function TypingContent({
         // next word
         if (
           letterCursorRef.current ===
-          words[wordCursorRef.current].pingyin.length - 1
+          wordsRef.current[wordCursorRef.current].pingyin.length - 1
         ) {
           setTimeout(() => {
             setTypingState((prev) =>
@@ -159,7 +180,7 @@ export default function TypingContent({
         );
         setTypingState((prev) =>
           produce(prev, (draft) => {
-            const word = words[wordCursorRef.current];
+            const word = wordsRef.current[wordCursorRef.current];
             const index = draft.inaccuracyWords.findIndex(
               (ele) => ele === word.chinese
             );

@@ -49,7 +49,6 @@ export default function useTimer() {
     if (statusRef.current != "TYPING") {
       return;
     }
-    console.log("pause");
     setLastPausedAt(new Date());
     setStatus("PAUSED");
   };
@@ -68,17 +67,13 @@ export default function useTimer() {
       return;
     }
     const now = new Date();
-    console.log("start at!!!", now);
     setStartTime(now);
-    console.log(now);
-
     setStatus("TYPING");
   };
   const end = () => {
     if (!["PAUSED", "TYPING"].includes(statusRef.current)) {
       return;
     }
-    console.log("end");
     setStartTime(null);
     setStatus("NOT_STARTED");
     setLastPausedAt(null);

@@ -17,8 +17,15 @@ export default function TypingPanel({
   textbook: string;
   words: Word[];
 }) {
-  const { typingStatus, duration, pause, resume, end, start, startTime } =
-    useTimer();
+  const {
+    typingStatus,
+    duration,
+    pause,
+    resume,
+    end: endTimer,
+    start: startTimer,
+    startTime,
+  } = useTimer();
   const [popping, setPopping] = useState(false);
   const { addHistory } = useHistoryStore();
   const [state, setState] = useState<TypingState>({
@@ -41,12 +48,6 @@ export default function TypingPanel({
   };
 
   useEffect(() => {
-    return () => {
-      console.log("unmount");
-    };
-  }, []);
-
-  useEffect(() => {
     setState((prev) => ({ ...prev, duration: duration }));
   }, [duration]);
 
@@ -60,6 +61,11 @@ export default function TypingPanel({
     stateRef.current = state;
   }, [state]);
 
+  const textbookRef = useRef(textbook);
+  useEffect(() => {
+    textbookRef.current = textbook;
+  }, [textbook]);
+
   return (
     <section>
       <TypingContent
@@ -70,24 +76,26 @@ export default function TypingPanel({
           pause,
           resume,
           start: () => {
-            console.log("popping", poppingRef.current);
             if (poppingRef.current) {
               return;
             }
-            start();
+            startTimer();
+          },
+          disrupt: () => {
+            // disrupt typing and drop data
+            endTimer();
+            resetState();
           },
           end: () => {
+            // end typing with record
             const lastState = { ...stateRef.current };
-            // console.log(state);
-            // console.log(lastState);
-
             addHistory({
               ...lastState,
-              textbook: textbook,
+              textbook: textbookRef.current,
               startAt: startTime || new Date(),
             });
             setPopping(true);
-            end();
+            endTimer();
             resetState();
           },
         }}
