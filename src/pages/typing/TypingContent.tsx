@@ -3,6 +3,7 @@ import "./styles.css";
 import useAppStore, { TypingState } from "../../store/appStore";
 import Mask from "./Mask";
 import { produce } from "immer";
+import { useShallow } from "zustand/react/shallow";
 export type Letter = {
   key: string;
   tone: string;
@@ -37,14 +38,17 @@ export default function TypingContent({
   start: () => void;
   typingStatus: "NOT_STARTED" | "PAUSED" | "TYPING";
 }) {
-  const {
-    config: { skipSpace, showTone, memoryMode },
-  } = useAppStore();
+  console.log("rerender");
+
+  const { showTone, memoryMode } = useAppStore(
+    useShallow((state) => ({
+      showTone: state.showTone,
+      memoryMode: state.memoryMode,
+    }))
+  );
 
   const [shake, setShake] = useState(false);
-
   const [wordCursor, setWordCursor] = useState(0);
-
   const [letterCursor, setLetterCursor] = useState(0);
 
   const endCurrentTying = () => {
@@ -64,12 +68,22 @@ export default function TypingContent({
   const typingStatusRef = useRef(typingStatus);
   const letterCursorRef = useRef(letterCursor);
   const wordCursorRef = useRef(wordCursor);
-  const skipSpaceRef = useRef(skipSpace);
   const wordsRef = useRef(words);
 
+  // const skipSpace = useAppStore(useShallow((state) => state.skipSpace));
+  const skipSpace = useAppStore.getState().skipSpace;
+  const skipSpaceRef = useRef(skipSpace);
   useEffect(() => {
-    skipSpaceRef.current = skipSpace;
-  }, [skipSpace]);
+    const unsubscribe = useAppStore.subscribe(
+      (state) => state.skipSpace,
+      (newSkipSpace, prevSkipSpace) => {
+        if (newSkipSpace !== prevSkipSpace) {
+          skipSpaceRef.current = newSkipSpace;
+        }
+      }
+    );
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     typingStatusRef.current = typingStatus;

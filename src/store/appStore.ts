@@ -1,13 +1,6 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-
-export type Config = {
-  skipSpace: boolean;
-  showTone: boolean;
-  memoryMode: boolean;
-  currentTextbook: Textbook;
-  textbooks: Textbook[];
-};
+import { subscribeWithSelector } from "zustand/middleware";
 
 export type TypingState = {
   duration: number;
@@ -24,8 +17,12 @@ export type Textbook = {
 };
 
 export type AppState = {
-  config: Config;
-  setConfigField: (field: Partial<Config>) => void;
+  skipSpace: boolean;
+  showTone: boolean;
+  memoryMode: boolean;
+  currentTextbook: Textbook;
+  textbooks: Textbook[];
+
   toggleSkipSpace: () => void;
   toggleShowTone: () => void;
   toggleMemoryMode: () => void;
@@ -34,10 +31,12 @@ export type AppState = {
 };
 
 const useAppStore = create<AppState>()(
-  immer((set) => ({
-    config: {
+  // subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })),
+  subscribeWithSelector(
+    immer((set) => ({
       skipSpace: true,
       showTone: true,
+      memoryMode: false,
       textbooks: [
         {
           name: "HKS1",
@@ -68,36 +67,33 @@ const useAppStore = create<AppState>()(
         name: "HKS1",
         path: "https://pub-f5fecce066d5492698e57a84754d6aae.r2.dev/hsk/1.json",
       },
-    } as Config,
 
-    toggleSkipSpace: () =>
-      set((state) => {
-        state.config.skipSpace = !state.config.skipSpace;
-      }),
+      toggleSkipSpace: () =>
+        set((state) => {
+          state.skipSpace = !state.skipSpace;
+        }),
 
-    toggleShowTone: () =>
-      set((state) => {
-        state.config.showTone = !state.config.showTone;
-      }),
+      toggleShowTone: () =>
+        set((state) => {
+          state.showTone = !state.showTone;
+        }),
 
-    toggleMemoryMode: () =>
-      set((state) => {
-        state.config.memoryMode = !state.config.memoryMode;
-      }),
+      toggleMemoryMode: () =>
+        set((state) => {
+          state.memoryMode = !state.memoryMode;
+        }),
 
-    setTextbooks: (textbooks: Textbook[]) =>
-      set((state) => {
-        state.config.textbooks = textbooks;
-      }),
+      setTextbooks: (textbooks: Textbook[]) =>
+        set((state) => {
+          state.textbooks = textbooks;
+        }),
 
-    setCurrentTextbook: (textbook: Textbook) =>
-      set((state) => {
-        state.config.currentTextbook = textbook;
-      }),
-
-    setConfigField: (field: Partial<Config>) =>
-      set((state) => ({ ...state, config: { ...state.config, ...field } })),
-  }))
+      setCurrentTextbook: (textbook: Textbook) =>
+        set((state) => {
+          state.currentTextbook = textbook;
+        }),
+    }))
+  )
 );
 
 export default useAppStore;

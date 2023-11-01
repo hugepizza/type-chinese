@@ -5,6 +5,8 @@ import TypingPanel from "./TypingPanel";
 import ControlPanel from "./controlPanel/Index";
 
 function Typing() {
+  console.log("render typing");
+
   const { name: textbookName, content: words } = useTextbook();
   return (
     <div className="flex flex-col h-screen">

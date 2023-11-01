@@ -1,10 +1,14 @@
+import { useShallow } from "zustand/react/shallow";
 import useAppStore from "../../../store/appStore";
 
 export default function TextbookButton() {
-  const {
-    setCurrentTextbook,
-    config: { textbooks, currentTextbook },
-  } = useAppStore();
+  const { setCurrentTextbook, textbooks, currentTextbook } = useAppStore(
+    useShallow((state) => ({
+      setCurrentTextbook: state.setCurrentTextbook,
+      textbooks: state.textbooks,
+      currentTextbook: state.currentTextbook,
+    }))
+  );
   return (
     <div className="dropdown dropdown-hover dropdown-left mx-1 flex flex-col items-center">
       <svg

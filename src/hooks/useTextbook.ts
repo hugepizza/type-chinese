@@ -4,13 +4,16 @@ import _ from "lodash";
 import { pinyin } from "pinyin-pro";
 import useAppStore from "../store/appStore";
 import { Letter, Word } from "../pages/typing/TypingContent";
+import { useShallow } from "zustand/react/shallow";
 export default function useTextbook() {
+  console.log("recall useTextbook");
+
   const shuffle = true;
   const {
-    config: {
-      currentTextbook: { path, name },
-    },
-  } = useAppStore();
+    currentTextbook: { path, name },
+  } = useAppStore(
+    useShallow((state) => ({ currentTextbook: state.currentTextbook }))
+  );
   const [content, setContent] = useState<Word[]>([]);
   useEffect(() => {
     fetch(path, { method: "GET" })
