@@ -2,15 +2,6 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 
-export type TypingState = {
-  duration: number;
-  keystrokes: number;
-  accuracy: number;
-  inaccuracy: number;
-  words: number;
-  inaccuracyWords: string[];
-};
-
 export type Textbook = {
   name: string;
   path: string;
@@ -30,7 +21,7 @@ export type AppState = {
   setCurrentTextbook: (book: Textbook) => void;
 };
 
-const useAppStore = create<AppState>()(
+const useSettingStore = create<AppState>()(
   // subscribeWithSelector(() => ({ paw: true, snout: true, fur: true })),
   subscribeWithSelector(
     immer((set) => ({
@@ -96,4 +87,4 @@ const useAppStore = create<AppState>()(
   )
 );
 
-export default useAppStore;
+export default useSettingStore;

@@ -1,5 +1,5 @@
 import { useShallow } from "zustand/react/shallow";
-import useAppStore from "../../../store/appStore";
+import useSettingStore from "../../../store/settingStore";
 import TextbookButton from "./TextbookButton";
 import TrackerButton from "./TrackerButton";
 
@@ -8,14 +8,16 @@ const preventKeyTigger = (event: React.KeyboardEvent<HTMLInputElement>) => {
 };
 export default function Panel() {
   const {
+    currentTextbook,
     skipSpace,
     showTone,
     memoryMode,
     toggleSkipSpace,
     toggleShowTone,
     toggleMemoryMode,
-  } = useAppStore(
+  } = useSettingStore(
     useShallow((state) => ({
+      currentTextbook: state.currentTextbook,
       skipSpace: state.skipSpace,
       showTone: state.showTone,
       memoryMode: state.memoryMode,
@@ -26,7 +28,7 @@ export default function Panel() {
   );
   return (
     <div className="card  items-center flex-row absolute m-4 right-0 top-0 p-4 shadow-xl ">
-      <label className="label flex-col">
+      <Item title="Skip Space">
         <input
           type="checkbox"
           className="toggle"
@@ -36,9 +38,8 @@ export default function Panel() {
             toggleSkipSpace();
           }}
         />
-        <span className="label-text">skip space</span>
-      </label>
-      <label className="label  flex-col">
+      </Item>
+      <Item title="Show Tone">
         <input
           type="checkbox"
           className="toggle"
@@ -48,9 +49,9 @@ export default function Panel() {
             toggleShowTone();
           }}
         />
-        <span className="label-text"> show tone</span>
-      </label>
-      <label className="label  flex-col">
+      </Item>
+
+      <Item title="Memory Mode">
         <input
           type="checkbox"
           className="toggle"
@@ -60,10 +61,28 @@ export default function Panel() {
             toggleMemoryMode();
           }}
         />
-        <span className="label-text"> memory mode</span>
-      </label>
-      <TextbookButton />
-      <TrackerButton />
+      </Item>
+      <Item title={currentTextbook.name}>
+        <TextbookButton />
+      </Item>
+      <Item title="history">
+        <TrackerButton />
+      </Item>
+    </div>
+  );
+}
+
+function Item({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
+  return (
+    <div className="label flex-col w-24">
+      {children}
+      <span className="mt-2 text-xs">{title}</span>
     </div>
   );
 }

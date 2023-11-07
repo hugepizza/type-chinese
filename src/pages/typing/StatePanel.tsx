@@ -1,10 +1,14 @@
-import { TypingState } from "../../store/appStore";
+import { useShallow } from "zustand/react/shallow";
+import useTypingStore from "../../store/typingStore";
 
-export default function StatePanel({
-  state: { duration, inaccuracy, words },
-}: {
-  state: TypingState;
-}) {
+export default function StatePanel() {
+  const { words, duration, inaccuracy } = useTypingStore(
+    useShallow((state) => ({
+      words: state.words,
+      duration: state.duration,
+      inaccuracy: state.inaccuracy,
+    }))
+  );
   return (
     <section className="card flex-row shadow-lg p-4">
       <div className="px-4 py-2">

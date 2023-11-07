@@ -1,28 +1,18 @@
-import { useEffect, useState } from "react";
-import { TypingState } from "../../store/appStore";
+import useHistoryStore from "../../store/historyStore";
 
 export default function EndupModal({
-  state,
   visible,
   setVisible,
 }: {
-  state: TypingState;
   visible: boolean;
   setVisible: (v: boolean) => void;
 }) {
-  const [localState, setLocalState] = useState<TypingState | null>(null);
-
-  useEffect(() => {
-    if (
-      state.duration === 0 &&
-      state.keystrokes === 0 &&
-      state.accuracy === 0 &&
-      state.inaccuracy === 0
-    ) {
-      return;
-    }
-    setLocalState(state);
-  }, [state]);
+  const { typingHistory } = useHistoryStore();
+  if (typingHistory.length === 0) {
+    return <></>;
+  }
+  const { duration, keystrokes, accuracy, words } =
+    typingHistory[typingHistory.length - 1];
   return (
     <>
       <input
@@ -39,18 +29,15 @@ export default function EndupModal({
           <div className="flex justify-center">
             <ol>
               <li className="py-1 text-start">
-                ⏰ spent {" " + ((localState?.duration || 0) / 1000).toFixed(2)}{" "}
-                s
+                ⏰ spent {" " + ((duration || 0) / 1000).toFixed(2)} s
               </li>
               <li className="py-1  text-start">
-                ⌨️ tpyed {" " + localState?.keystrokes} keys
+                ⌨️ tpyed {" " + keystrokes} keys
               </li>
               <li className="py-1  text-start">
-                ⭕️ typed{" " + localState?.accuracy} accuracy keys
+                ⭕️ typed{" " + accuracy} accuracy keys
               </li>
-              <li className="py-1  text-start">
-                🔤 typed {" " + localState?.words} words
-              </li>
+              <li className="py-1  text-start">🔤 typed {" " + words} words</li>
             </ol>
           </div>
 

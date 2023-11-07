@@ -1,78 +1,26 @@
 import "./styles.css";
-import TypingContent, { Word } from "./TypingContent";
-import StatePanel from "./StatePanel";
+import TypingContent from "./TypingContent";
 import useTimer from "../../hooks/useTimer";
 
 import { useEffect, useRef, useState } from "react";
 import React from "react";
-import { TypingState } from "../../store/appStore";
-import useHistoryStore from "../../store/historyStore";
+import useTextbook from "../../hooks/useTextbook";
 
 const EndupModal = React.lazy(() => import("./EndupModal"));
 
-export default function TypingPanel({
-  textbook,
-  words,
-}: {
-  textbook: string;
-  words: Word[];
-}) {
-  const {
-    typingStatus,
-    duration,
-    pause,
-    resume,
-    end: endTimer,
-    start: startTimer,
-    startTime,
-  } = useTimer();
+export default function TypingPanel() {
+  useTextbook();
+  const { pause, resume, end: endTimer, start: startTimer } = useTimer();
   const [popping, setPopping] = useState(false);
-  const { addHistory } = useHistoryStore();
-  const [state, setState] = useState<TypingState>({
-    duration: 0,
-    keystrokes: 0,
-    accuracy: 0,
-    inaccuracy: 0,
-    words: 0,
-    inaccuracyWords: [],
-  });
-  const resetState = () => {
-    setState({
-      duration: 0,
-      keystrokes: 0,
-      accuracy: 0,
-      inaccuracy: 0,
-      words: 0,
-      inaccuracyWords: [],
-    });
-  };
-
-  useEffect(() => {
-    setState((prev) => ({ ...prev, duration: duration }));
-  }, [duration]);
-
   const poppingRef = useRef(popping);
   useEffect(() => {
     poppingRef.current = popping;
   }, [popping]);
 
-  const stateRef = useRef(state);
-  useEffect(() => {
-    stateRef.current = state;
-  }, [state]);
-
-  const textbookRef = useRef(textbook);
-  useEffect(() => {
-    textbookRef.current = textbook;
-  }, [textbook]);
-
   return (
-    <section>
+    <section className="w-full">
       <TypingContent
         {...{
-          typingStatus,
-          setTypingState: setState,
-          words,
           pause,
           resume,
           start: () => {
@@ -84,24 +32,14 @@ export default function TypingPanel({
           disrupt: () => {
             // disrupt typing and drop data
             endTimer();
-            resetState();
           },
           end: () => {
-            // end typing with record
-            const lastState = { ...stateRef.current };
-            addHistory({
-              ...lastState,
-              textbook: textbookRef.current,
-              startAt: startTime || new Date(),
-            });
             setPopping(true);
             endTimer();
-            resetState();
           },
         }}
       />
-      <StatePanel state={state} />
-      <EndupModal state={state} visible={popping} setVisible={setPopping} />
+      <EndupModal visible={popping} setVisible={setPopping} />
     </section>
   );
 }

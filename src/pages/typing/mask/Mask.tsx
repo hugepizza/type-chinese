@@ -1,3 +1,5 @@
+import NotStart from "./NotStart";
+
 export default function Mask({ typingStatus }: { typingStatus: string }) {
   return (
     <div
@@ -5,11 +7,7 @@ export default function Mask({ typingStatus }: { typingStatus: string }) {
         typingStatus != "TYPING" ? "z-10 backdrop-blur-[6px]" : "hidden"
       }`}
     >
-      {typingStatus === "NOT_STARTED" && (
-        <>
-          Press<kbd className="kbd kbd-md mx-2">Enter</kbd> to start
-        </>
-      )}
+      {typingStatus === "NOT_STARTED" && <NotStart />}
       {typingStatus === "PAUSED" && (
         <div className="flex flex-col">
           <span>

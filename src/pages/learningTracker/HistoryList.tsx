@@ -1,4 +1,4 @@
-import { TypingRecord } from "../../store/historyStore";
+import { TypingRecord } from "../../store/typingStore";
 
 export default function HistoryList({ history }: { history: TypingRecord[] }) {
   return (
@@ -15,9 +15,9 @@ export default function HistoryList({ history }: { history: TypingRecord[] }) {
       </thead>
       <tbody>
         {history.map((ele, index) => (
-          <tr key={ele.startAt.toString()}>
+          <tr key={ele.startTime!.toString()}>
             <th>{index + 1}</th>
-            <td>{new Date(ele.startAt).toLocaleString()}</td>
+            <td>{new Date(ele.startTime!).toLocaleString()}</td>
             <td>{(ele.duration / 1000).toFixed(0) + "s"}</td>
             <td>{ele.textbook}</td>
             <td>{ele.words.toLocaleString()}</td>
