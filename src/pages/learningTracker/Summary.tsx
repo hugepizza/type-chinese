@@ -1,4 +1,4 @@
-import { TypingRecord } from "../../store/historyStore";
+import { TypingRecord } from "../../store/typingStore";
 
 export default function Summary({ history }: { history: TypingRecord[] }) {
   const duration = history.reduce((prev, curr) => prev + curr.duration, 0);

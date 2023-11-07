@@ -1,12 +1,21 @@
 import { useEffect, useState, useRef } from "react";
+import useTypingStore from "../store/typingStore";
+import { useShallow } from "zustand/react/shallow";
 export default function useTimer() {
-  const [startTime, setStartTime] = useState<Date | null>(null);
+  const { status, setStatus, setStartTime, startTime, duration, setDuration } =
+    useTypingStore(
+      useShallow((state) => ({
+        status: state.status,
+        setStatus: state.setStatus,
+        setStartTime: state.setStartTime,
+        startTime: state.startTime,
+        duration: state.duration,
+        setDuration: state.setDuration,
+      }))
+    );
   const [lastPausedAt, setLastPausedAt] = useState(startTime);
-  const [status, setStatus] = useState<"NOT_STARTED" | "PAUSED" | "TYPING">(
-    "NOT_STARTED"
-  );
+
   const [pausedDuration, setPausedDuration] = useState<number>(0);
-  const [duration, setDuration] = useState(0);
   const statusRef = useRef(status);
   const durationRef = useRef(duration);
   const pausedDurationRef = useRef(pausedDuration);
@@ -33,7 +42,6 @@ export default function useTimer() {
     const interval = setInterval(() => {
       if (statusRef.current === "TYPING") {
         const now = new Date();
-
         const duration = Math.floor(
           now.getTime() - startTimeRef.current!.getTime()
         );
@@ -81,12 +89,9 @@ export default function useTimer() {
   };
 
   return {
-    typingStatus: status,
-    duration,
     pause,
     resume,
     start,
     end,
-    startTime,
   };
 }

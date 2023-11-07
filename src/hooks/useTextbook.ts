@@ -2,17 +2,25 @@ import { useEffect, useState } from "react";
 import _ from "lodash";
 
 import { pinyin } from "pinyin-pro";
-import useAppStore from "../store/appStore";
+import useSettingStore from "../store/settingStore";
 import { Letter, Word } from "../pages/typing/TypingContent";
 import { useShallow } from "zustand/react/shallow";
+import useTypingStore from "../store/typingStore";
 export default function useTextbook() {
   console.log("recall useTextbook");
 
   const shuffle = true;
   const {
     currentTextbook: { path, name },
-  } = useAppStore(
+  } = useSettingStore(
     useShallow((state) => ({ currentTextbook: state.currentTextbook }))
+  );
+  const { setWordsList, plan, setTextbook } = useTypingStore(
+    useShallow((state) => ({
+      setTextbook: state.setTextbook,
+      setWordsList: state.setWordsList,
+      plan: state.plan,
+    }))
   );
   const [content, setContent] = useState<Word[]>([]);
   useEffect(() => {
@@ -35,8 +43,15 @@ export default function useTextbook() {
             english: seg.en,
           };
         });
-        setContent(shuffle ? _.shuffle(words) : words);
+
+        const content = shuffle ? _.shuffle(words) : words;
+        setContent(content);
+        setTextbook(name);
       });
-  }, [shuffle, path]);
-  return { name, content };
+  }, [path]);
+  useEffect(() => {
+    setWordsList(content.slice(0, plan));
+  }, [content, plan]);
+
+  return { name };
 }

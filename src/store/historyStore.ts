@@ -1,10 +1,6 @@
 import { create } from "zustand";
-import { TypingState } from "./appStore";
 import { persist } from "zustand/middleware";
-export type TypingRecord = TypingState & {
-  startAt: Date;
-  textbook: string;
-};
+import { TypingRecord } from "./typingStore";
 
 export type History = {
   typingHistory: TypingRecord[];

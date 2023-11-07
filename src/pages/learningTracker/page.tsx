@@ -9,7 +9,8 @@ function LearningTracker() {
   const endAt = new Date();
   const startAt = new Date(endAt.getFullYear(), endAt.getMonth(), 1, 0, 0, 0);
   const month = typingHistory.filter(
-    (ele) => new Date(ele.startAt) <= endAt && new Date(ele.startAt) >= startAt
+    (ele) =>
+      new Date(ele.startTime!) <= endAt && new Date(ele.startTime!) >= startAt
   );
   return (
     <main className="flex flex-col items-start justify-start mt-4">

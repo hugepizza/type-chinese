@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./styles.css";
-import useAppStore, { TypingState } from "../../store/appStore";
-import Mask from "./Mask";
-import { produce } from "immer";
+import useSettingStore from "../../store/settingStore";
+import Mask from "./mask/Mask";
 import { useShallow } from "zustand/react/shallow";
+import useTypingStore from "../../store/typingStore";
+import useHistoryStore from "../../store/historyStore";
 export type Letter = {
   key: string;
   tone: string;
@@ -20,27 +21,41 @@ const inMonitoringKeys = (key: string) =>
   ((key >= "A" && key <= "Z") || (key >= "a" && key <= "z") || key === " ");
 
 export default function TypingContent({
-  words,
-  setTypingState,
   pause,
   resume,
   end,
   disrupt,
   start,
-  typingStatus,
 }: {
-  words: Word[];
-  setTypingState: React.Dispatch<React.SetStateAction<TypingState>>;
   pause: () => void;
   resume: () => void;
   end: () => void;
   disrupt: () => void;
   start: () => void;
-  typingStatus: "NOT_STARTED" | "PAUSED" | "TYPING";
 }) {
   console.log("rerender");
-
-  const { showTone, memoryMode } = useAppStore(
+  const {
+    wordsList: words,
+    status: typingStatus,
+    plan: plan,
+    incAccuracy,
+    incInaccuracy,
+    incKeystrokes,
+    pushAnaccuracyWords,
+    incWords,
+  } = useTypingStore(
+    useShallow((state) => ({
+      wordsList: state.wordsList,
+      status: state.status,
+      plan: state.plan,
+      incAccuracy: state.incAccuracy,
+      incInaccuracy: state.incInaccuracy,
+      incKeystrokes: state.incKeystrokes,
+      pushAnaccuracyWords: state.pushAnaccuracyWords,
+      incWords: state.incWords,
+    }))
+  );
+  const { showTone, memoryMode } = useSettingStore(
     useShallow((state) => ({
       showTone: state.showTone,
       memoryMode: state.memoryMode,
@@ -51,30 +66,33 @@ export default function TypingContent({
   const [wordCursor, setWordCursor] = useState(0);
   const [letterCursor, setLetterCursor] = useState(0);
 
-  const endCurrentTying = () => {
+  const endCurrentTying = useCallback(() => {
     console.log("endCurrentTying");
     setLetterCursor(0);
     setWordCursor(0);
+    useHistoryStore.getState().addHistory({ ...useTypingStore.getState() });
+    useTypingStore.getState().reset();
     end();
-  };
-
-  const disruptCurrentTying = () => {
+  }, []);
+  const disruptCurrentTying = useCallback(() => {
     console.log("disruptCurrentTying");
     setLetterCursor(0);
     setWordCursor(0);
     disrupt();
-  };
+  }, []);
+
   // ref in call back
   const typingStatusRef = useRef(typingStatus);
   const letterCursorRef = useRef(letterCursor);
   const wordCursorRef = useRef(wordCursor);
   const wordsRef = useRef(words);
+  const planRef = useRef(plan);
 
   // const skipSpace = useAppStore(useShallow((state) => state.skipSpace));
-  const skipSpace = useAppStore.getState().skipSpace;
+  const skipSpace = useSettingStore.getState().skipSpace;
   const skipSpaceRef = useRef(skipSpace);
   useEffect(() => {
-    const unsubscribe = useAppStore.subscribe(
+    const unsubscribe = useSettingStore.subscribe(
       (state) => state.skipSpace,
       (newSkipSpace, prevSkipSpace) => {
         if (newSkipSpace !== prevSkipSpace) {
@@ -99,8 +117,9 @@ export default function TypingContent({
 
   useEffect(() => {
     wordsRef.current = words;
+    planRef.current = plan;
     disruptCurrentTying();
-  }, [words]);
+  }, [words, plan]);
 
   const handleKeyDown = (e: KeyboardEvent) => {
     e.stopPropagation();
@@ -112,7 +131,7 @@ export default function TypingContent({
       }
     } else if (typingStatusRef.current === "PAUSED") {
       if (typedKey === "Escape") {
-        endCurrentTying();
+        disruptCurrentTying();
       }
       if (typedKey === "Enter") {
         resume();
@@ -156,18 +175,11 @@ export default function TypingContent({
         expectedKey === " " ? "space" : expectedKey,
         typedKey === " " ? "space" : typedKey
       );
-      setTypingState((prev) =>
-        produce(prev, (draft) => {
-          ++draft.keystrokes;
-        })
-      );
+
+      incKeystrokes();
       // correct
       if (expectedKey === typedKey) {
-        setTypingState((prev) =>
-          produce(prev, (draft) => {
-            ++draft.accuracy;
-          })
-        );
+        incAccuracy();
         // next letter
         setLetterCursor(letterCursorRef.current + stepAfterCorrect);
         // next word
@@ -175,35 +187,21 @@ export default function TypingContent({
           letterCursorRef.current ===
           wordsRef.current[wordCursorRef.current].pingyin.length - 1
         ) {
-          setTimeout(() => {
-            setTypingState((prev) =>
-              produce(prev, (draft) => {
-                ++draft.words;
-              })
-            );
-            setWordCursor(wordCursorRef.current + 1);
-            setLetterCursor(0);
-          }, 180);
+          incWords();
+          if (wordCursorRef.current >= planRef.current - 1) {
+            endCurrentTying();
+          } else {
+            setTimeout(() => {
+              setWordCursor(wordCursorRef.current + 1);
+              setLetterCursor(0);
+            }, 180);
+          }
         }
       } else {
         // wrong
-        setTypingState((prev) =>
-          produce(prev, (draft) => {
-            ++draft.inaccuracy;
-          })
-        );
-        setTypingState((prev) =>
-          produce(prev, (draft) => {
-            const word = wordsRef.current[wordCursorRef.current];
-            const index = draft.inaccuracyWords.findIndex(
-              (ele) => ele === word.chinese
-            );
-            if (index === -1) {
-              draft.inaccuracyWords.push(word.chinese);
-            }
-          })
-        );
-
+        const word = wordsRef.current[wordCursorRef.current];
+        pushAnaccuracyWords(word.chinese);
+        incInaccuracy();
         setLetterCursor(0);
         setShake(true);
         setTimeout(() => setShake(false), 100);
@@ -217,9 +215,12 @@ export default function TypingContent({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+  if (words.length === 0) {
+    return <section className="my-32 w-full"></section>;
+  }
 
   return (
-    <section className="my-32">
+    <section className="my-32 w-full">
       <div className={`relative ${shake ? "shake" : ""}`}>
         <Mask typingStatus={typingStatus} />
         <div>

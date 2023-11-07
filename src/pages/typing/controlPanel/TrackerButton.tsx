@@ -9,7 +9,7 @@ export default function TrackerButton() {
         viewBox="0 0 24 24"
         strokeWidth={1.5}
         stroke="currentColor"
-        className="w-6 h-6"
+        className="w-7 h-7"
       >
         <path
           strokeLinecap="round"
@@ -17,7 +17,6 @@ export default function TrackerButton() {
           d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <span className="label-text">{"history"}</span>
     </Link>
   );
 }
